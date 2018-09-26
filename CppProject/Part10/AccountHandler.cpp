@@ -54,7 +54,7 @@ void AccountHandler::MakeNomalAccount()
 	cout << " ----------- [보통예금계좌 개설창] ---------------";
 
 	cout << endl << "계좌계설 ";
-	cout << endl << "계좌ID: "; cin >> id;
+	cout << endl << "계좌번호: "; cin >> id;
 	cout << endl << "이름: "; cin >> name;
 	cout << endl << "입금액: "; cin >> money;
 	cout << endl << "이자율: "; cin >> intereat;
@@ -77,7 +77,7 @@ void AccountHandler::MakeHicreditAccount()
 	cout << " ----------- [신뢰예금계좌 개설창] ---------------";
 
 	cout << endl << "계좌계설 ";
-	cout << endl << "계좌ID: "; cin >> id;
+	cout << endl << "계좌번호: "; cin >> id;
 	cout << endl << "이름: "; cin >> name;
 	cout << endl << "입금액: "; cin >> money;
 	cout << endl << "이자율: "; cin >> intereat;
@@ -105,23 +105,34 @@ void AccountHandler::DepositMoney()				//기능2. 입 금
 	int id = 0;
 	long intereat;
 	int sw = 0;
-
 	cout << "---------2.입금하기-----------" << endl;
-	cout << "계좌ID: "; cin >> id;
-
+	cout << "계좌번호: "; cin >> id;
+	
 	for (i = 0; i < cnt; i++)
 	{
 		if (Accarr[i]->accID == id)					//id가 같다면
 		{
 			cout << endl << "입금액: "; cin >> money;
-			Accarr[i]->AMOUNT += money;
-			cout << endl << "이자율: "; cin >> intereat;
-			cout << "입금 완료";
-			sw = 1;
+			try
+			{
+				if (money < 0)			//입금액이 0보다작음
+				{
+					throw money;
+				}			//money 던짐
+
+				Accarr[i]->AMOUNT += money;
+				cout << endl << "이자율: "; cin >> intereat;
+				cout << "입금 완료";
+				sw = 1;
+			}
+			catch (int error)
+			{
+				cout << "입금 금액은 0원 이상이어야 합니다. " << endl;
+			}
 		}
 	}
-	if (sw = 0)
-		cout << "유효하지 않은 ID 입니다." << endl;
+	if (sw == 0)
+		cout << "유효하지 않은 계좌번호 입니다." << endl;
 
 }
 void AccountHandler::WithdrawMoney()			//기능3. 출 금
@@ -132,21 +143,39 @@ void AccountHandler::WithdrawMoney()			//기능3. 출 금
 	int i;
 	cout << "---------3.출금하기------------" << endl;
 
-	cout << "계좌ID: "; cin >> id;
+	cout << "계좌번호: "; cin >> id;
 
 	for (i = 0; i < cnt; i++)
 	{
 		if (Accarr[i]->accID == id)							//accID를 가리키는 배열?
 		{
 			cout << "출금액: "; cin >> money;
-			Accarr[i]->AMOUNT -= money;					//출금 연산
-			cout << endl << "출금 완료";
-			sw = 1;									//if(sw=0)이 실행되지 않도록  값을 1로 바꾸어줌
+			try
+			{
+				if (Accarr[i]->AMOUNT < money)				//예금 금액보다 출금금액이 클경우
+				{
+					throw money;
+				}
+				else if (money < 0)
+				{
+					cout << "출금금액이 0원보다 작을 수는 없습니다. " << endl;
+				}
+				else
+				{
+					Accarr[i]->AMOUNT -= money;					//출금 연산
+					cout << endl << "출금 완료";
+					sw = 1;
+				}
+			}									//if(sw=0)이 실행되지 않도록  값을 1로 바꾸어줌
+			catch (int error)
+			{
+				cout << "예금금액을 초과 합니다!!!" << endl;
+			}
 		}
 	}
-	if (sw = 0)
+	if (sw == 0)
 	{
-		cout << "유효하지 않은 ID 입니다. " << endl;
+		cout << "유효하지 않은 계좌번호 입니다. " << endl;
 	}
 
 
@@ -158,7 +187,7 @@ void AccountHandler::ShowAllAccInfo() 	//4.잔액 조회
 
 	for (i = 0; i < cnt; i++)
 	{
-		cout << "계좌ID: " << Accarr[i]->accID << endl;
+		cout << "계좌번호: " << Accarr[i]->accID << endl;
 		cout << "이름: " << Accarr[i]->NAME << endl;
 		cout << "잔액: " << Accarr[i]->AMOUNT << endl;
 	}
